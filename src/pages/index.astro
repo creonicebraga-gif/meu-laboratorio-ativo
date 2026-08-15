@@ -1,72 +1,74 @@
 ---
-// Arquivo com sintaxe corrigida e testada
+// src/pages/index.astro
+import Layout from '../layouts/Layout.astro';
 ---
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8" />
-    <title>Bunker de Alan Turing</title>
-    <style>
-        body { background-color: #0f0f1a; color: #e2e8f0; font-family: sans-serif; padding: 40px; }
-        .caixa { background-color: #1e1e38; padding: 30px; border-radius: 12px; max-width: 600px; margin: 0 auto; }
-        textarea { width: 100%; height: 100px; background-color: #0d0d16; color: #a6e3a1; font-family: monospace; padding: 10px; box-sizing: border-box; }
-        button { background-color: #4f46e5; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; margin-top: 10px; font-weight: bold; }
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 6px; display: none; font-weight: bold; }
-    </style>
-</head>
-<body>
 
-    <div class="caixa">
-        <h2>🔐 O Bunker de Alan Turing</h2>
-        <p>Sua Missão: Complete a função para retornar o texto de trás para frente!</p>
-        
-        <textarea id="txtAluno" is:raw>function decifrarMensagem(texto) {
+<Layout title="Laboratório dos Mestres da Lógica">
+  <main style="max-width: 800px; margin: 0 auto; padding: 20px; color: #e2e8f0;">
+    <h1 style="text-align: center; color: #818cf8; margin-top: 40px;">Duolingo da TI - Laboratório Ativo</h1>
+    
+    <div class="bunker-turing" style="background-color: #16162a; padding: 25px; border-radius: 12px; border: 1px solid #2d2d44; margin-top: 20px;">
+      <h2>🔐 O Bunker de Alan Turing</h2>
+      <p style="color: #94a3b8;"><strong>Sua Missão:</strong> Complete a função para retornar o texto de trás para frente!</p>
+      
+      <textarea id="txtAluno" rows="6" style="width: 100%; background-color: #0d0d16; color: #a6e3a1; font-family: monospace; padding: 10px; box-sizing: border-box; border-radius: 6px;">function decifrarMensagem(texto) {
     return texto;
 }</textarea>
-        
-        <button id="btnChecar">🚀 Validar Algoritmo</button>
-        <div id="divFeedback" class="feedback"></div>
+      
+      <button id="btnValidarTuring" style="background-color: #4f46e5; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 15px;">🚀 Validar Algoritmo</button>
+      <div id="divFeedback" style="display: none; margin-top: 15px; padding: 15px; border-radius: 6px; font-weight: bold;"></div>
     </div>
+  </main>
+</Layout>
 
-    <script>
-        let erros = 0;
-        const btn = document.getElementById('btnChecar');
-        const txt = document.getElementById('txtAluno');
-        const fd = document.getElementById('divFeedback');
+<script>
+  import { supabase } from '../lib/supabaseClient';
 
-        btn?.addEventListener('click', () => {
-            if (fd) fd.style.display = "block";
-            try {
-                const codigoTxt = txt ? txt.value : '';
-                const funcao = new Function(codigoTxt + "; return decifrarMensagem;");
-                const executar = funcao();
-                
-                if (executar("AMGINE") === "ENIGMA" && fd) {
-                    fd.style.backgroundColor = "#1e3a1e";
-                    fd.style.color = "#a6e3a1";
-                    fd.innerHTML = "✅ SUCESSO! Você ganhou a Medalha Alan Turing! 🏅";
-                    erros = 0;
-                } else if (fd) {
-                    erros++;
-                    if (erros < 3) {
-                        fd.style.backgroundColor = "#3a3a1e";
-                        fd.style.color = "#f9e2af";
-                        fd.innerHTML = "❌ Código incorreto. Tentativas: " + erros + "/3";
-                    } else {
-                        fd.style.backgroundColor = "#2e2e42";
-                        fd.style.color = "#f9e2af";
-                        fd.innerHTML = "💡 *MENTORIA* 💡<br><br>Use: <code>return texto.split('').reverse().join('');</code>";
-                    }
-                }
-            } catch (e) {
-                erros++;
-                if (fd) {
-                    fd.style.backgroundColor = "#3a1e1e";
-                    fd.style.color = "#f38ba8";
-                    fd.innerHTML = "💥 ERRO DE SINTAXE! Verifique as chaves.";
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+  const txt = document.getElementById('txtAluno') as HTMLTextAreaElement;
+  const fd = document.getElementById('divFeedback') as HTMLDivElement;
+  const btn = document.getElementById('btnValidarTuring');
+
+  let erros = 0;
+
+  btn?.addEventListener('click', async () => {
+    if (fd) fd.style.display = "block";
+
+    try {
+      const codigoTxt = txt ? txt.value : '';
+      const funcao = new Function(codigoTxt + "; return decifrarMensagem;");
+      const executar = funcao();
+      
+      if (executar("AMGINE") === "ENIGMA") {
+        if (fd) {
+          fd.style.backgroundColor = "#1e3a1e";
+          fd.style.color = "#a6e3a1";
+          fd.innerHTML = "✅ SUCESSO! Você ganhou a Medalha Alan Turing! 🏅";
+        }
+        erros = 0;
+
+        await supabase.from('historico_medalhas').insert([
+          { 
+            aluno_id: "aluno_teste_01", 
+            medalha_nome: "Decifrador da Enigma", 
+            curso_origem: "Blog_Astro_Principal" 
+          }
+        ]);
+
+      } else {
+        erros++;
+        if (fd) {
+          fd.style.backgroundColor = "#3a3a1e";
+          fd.style.color = "#f9e2af";
+          fd.innerHTML = ❌ Código incorreto. Tentativas: ${erros}/3;
+        }
+      }
+    } catch (erro) {
+      erros++;
+      if (fd) {
+        fd.style.backgroundColor = "#3a1e1e";
+        fd.style.color = "#f38ba8";
+        fd.innerHTML = "💥 ERRO DE SINTAXE! Verifique as chaves.";
+      }
+    }
+  });
+</script>

@@ -1,6 +1,7 @@
 ---
 // src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
+import { supabase } from '../lib/supabaseClient';
 ---
 
 <Layout title="Laboratório dos Mestres da Lógica">
@@ -8,7 +9,7 @@ import Layout from '../layouts/Layout.astro';
     <h1 style="text-align: center; color: #818cf8; margin-top: 40px;">Duolingo da TI - Laboratório Ativo</h1>
     
     <div class="bunker-turing" style="background-color: #16162a; padding: 25px; border-radius: 12px; border: 1px solid #2d2d44; margin-top: 20px;">
-      <h2>🔐 O Bunker de Alan Turing</h2>
+      <h2> O Bunker de Alan Turing</h2>
       <p style="color: #94a3b8;"><strong>Sua Missão:</strong> Complete a função para retornar o texto de trás para frente!</p>
       
       <textarea id="txtAluno" rows="6" style="width: 100%; background-color: #0d0d16; color: #a6e3a1; font-family: monospace; padding: 10px; box-sizing: border-box; border-radius: 6px;">function decifrarMensagem(texto) {
@@ -22,7 +23,7 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  import { supabase } from '../lib/supabaseClient';
+  
 
   const txt = document.getElementById('txtAluno') as HTMLTextAreaElement;
   const fd = document.getElementById('divFeedback') as HTMLDivElement;
